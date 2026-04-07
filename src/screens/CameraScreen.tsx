@@ -38,6 +38,13 @@ export function CameraScreen({ navigation }: Props) {
     return (
       <View style={styles.centered}>
         <Text style={styles.message}>Camera access is needed to capture photo notes.</Text>
+        {Platform.OS === 'web' ? (
+          <Text style={styles.hint}>
+            After you tap below, your browser will ask again — choose Allow. If the camera never
+            starts, open this page in a full browser tab (not a small preview), or use Expo Go on
+            your phone.
+          </Text>
+        ) : null}
         <Pressable style={styles.button} onPress={() => void requestPermission()}>
           <Text style={styles.buttonText}>Grant permission</Text>
         </Pressable>
@@ -140,6 +147,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     color: '#333',
+  },
+  hint: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    lineHeight: 20,
+    maxWidth: 340,
   },
   button: {
     backgroundColor: '#2563eb',
