@@ -10,6 +10,7 @@
     "start": "electron-vite preview",
     "build": "electron-vite build",
     "test": "vitest run",
+    "test:e2e": "vite-node scripts/functional-e2e.mts",
     "test:watch": "vitest",
     "lint": "eslint .",
     "format": "prettier --write ."
