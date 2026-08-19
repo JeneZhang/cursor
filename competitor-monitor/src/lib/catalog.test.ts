@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyDraft, parseCompetitors, uniqueId, validateDraft } from './catalog'
+import { applyDraft, parseCompetitors, uniqueId, validateDraft, mergeStoredWithSeed } from './catalog'
 import type { Competitor, CompetitorDraft } from '../types'
 
 const seed: Competitor[] = [
@@ -60,5 +60,37 @@ describe('catalog', () => {
     )
     expect(parsed).toHaveLength(1)
     expect(parsed[0].priority).toBe('P0')
+  })
+
+  it('fills empty ChatGPT fields from seed without duplicating', () => {
+    const chatgptSeed: Competitor = {
+      ...seed[0],
+      id: 'chatgpt',
+      name: 'ChatGPT 桌面客户端',
+      vendor: 'OpenAI',
+      posture: 'Chat + Work + Codex',
+      summary: 'unified desktop app',
+      website: 'https://chatgpt.com/download',
+      watchUrl: 'https://help.openai.com/en/articles/6825453-release-notes',
+      watchLabel: 'ChatGPT Release Notes',
+      threatNotes: 'default entry'
+    }
+    const stored: Competitor = {
+      ...chatgptSeed,
+      id: 'chatgpt',
+      name: 'chatgpt桌面客户端',
+      vendor: '',
+      posture: '',
+      summary: '',
+      website: '',
+      watchUrl: '',
+      watchLabel: '',
+      threatNotes: ''
+    }
+    const merged = mergeStoredWithSeed([stored], [chatgptSeed, seed[0]])
+    const chatgpt = merged.find((item) => item.id === 'chatgpt')
+    expect(chatgpt?.vendor).toBe('OpenAI')
+    expect(chatgpt?.name).toBe('chatgpt桌面客户端')
+    expect(merged.filter((item) => item.id === 'chatgpt')).toHaveLength(1)
   })
 })

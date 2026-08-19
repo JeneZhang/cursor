@@ -95,12 +95,56 @@ export function parseCompetitors(raw: unknown, fallback: Competitor[]): Competit
   return items.length > 0 ? sortCompetitors(items) : fallback
 }
 
+const TEXT_FIELDS = [
+  'vendor',
+  'posture',
+  'summary',
+  'website',
+  'watchUrl',
+  'watchLabel',
+  'threatNotes'
+] as const
+
+export function looksLikeChatgpt(item: Pick<Competitor, 'id' | 'name'>): boolean {
+  return /chatgpt/i.test(`${item.id} ${item.name}`)
+}
+
+export function findSeedMatch(item: Competitor, seed: Competitor[]): Competitor | undefined {
+  const byId = seed.find((candidate) => candidate.id === item.id)
+  if (byId) return byId
+  if (looksLikeChatgpt(item)) return seed.find((candidate) => candidate.id === 'chatgpt')
+  return undefined
+}
+
+export function fillEmptyFromSeed(item: Competitor, seedItem: Competitor): Competitor {
+  const filled: Competitor = { ...item }
+  for (const field of TEXT_FIELDS) {
+    if (filled[field].trim().length === 0) filled[field] = seedItem[field]
+  }
+  return filled
+}
+
+export function mergeStoredWithSeed(stored: Competitor[], seed: Competitor[]): Competitor[] {
+  const filled = stored.map((item) => {
+    const match = findSeedMatch(item, seed)
+    return match ? fillEmptyFromSeed(item, match) : item
+  })
+  const present = new Set(filled.map((item) => item.id))
+  const hasChatgpt = filled.some(looksLikeChatgpt)
+  const extras = seed.filter((item) => {
+    if (present.has(item.id)) return false
+    if (item.id === 'chatgpt' && hasChatgpt) return false
+    return true
+  })
+  return sortCompetitors([...filled, ...extras])
+}
+
 export function loadCompetitors(seed: Competitor[]): Competitor[] {
   if (typeof localStorage === 'undefined') return sortCompetitors(seed)
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return sortCompetitors(seed)
-    return parseCompetitors(JSON.parse(raw) as unknown, seed)
+    return mergeStoredWithSeed(parseCompetitors(JSON.parse(raw) as unknown, seed), seed)
   } catch {
     return sortCompetitors(seed)
   }
