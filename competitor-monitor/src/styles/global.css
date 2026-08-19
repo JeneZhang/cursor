@@ -1,47 +1,26 @@
 :root {
-  color-scheme: light dark;
-  --bg: #f4f6f8;
-  --panel: #ffffff;
-  --panel-border: #d8dee6;
-  --text: #1b2430;
-  --muted: #5b6777;
-  --accent: #2563eb;
-  --accent-text: #ffffff;
-  --danger: #b42318;
-  --danger-bg: #fef3f2;
-  --ok: #027a48;
-  --ok-bg: #ecfdf3;
-  --warn-bg: #fff7ed;
-  --warn-text: #9a3412;
-  --row-hover: #eef3f9;
-  --selected: #dbe7ff;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  color-scheme: dark;
+  --bg: #111827;
+  --panel: #1f2937;
+  --panel-border: #374151;
+  --text: #f3f4f6;
+  --muted: #9ca3af;
+  --accent: #60a5fa;
+  --accent-text: #0b1220;
+  --danger: #fca5a5;
+  --danger-bg: #3f1d1d;
+  --ok: #6ee7b7;
+  --ok-bg: #12352b;
+  --warn-bg: #3b2a14;
+  --warn-text: #fdba74;
+  --row-hover: #273449;
+  --selected: #1e3a5f;
+  --shadow: none;
   font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
   font-size: 14px;
   line-height: 1.4;
   color: var(--text);
   background: var(--bg);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111827;
-    --panel: #1f2937;
-    --panel-border: #374151;
-    --text: #f3f4f6;
-    --muted: #9ca3af;
-    --accent: #60a5fa;
-    --accent-text: #0b1220;
-    --danger: #fca5a5;
-    --danger-bg: #3f1d1d;
-    --ok: #6ee7b7;
-    --ok-bg: #12352b;
-    --warn-bg: #3b2a14;
-    --warn-text: #fdba74;
-    --row-hover: #273449;
-    --selected: #1e3a5f;
-    --shadow: none;
-  }
 }
 
 * {
@@ -341,8 +320,8 @@ button:disabled {
 }
 
 .badge.p0 {
-  background: #fee4e2;
-  color: #b42318;
+  background: #3f1d1d;
+  color: #fca5a5;
 }
 
 .badge.done,
@@ -352,34 +331,18 @@ button:disabled {
 }
 
 .badge.high {
-  background: #fee4e2;
-  color: #b42318;
+  background: #3f1d1d;
+  color: #fca5a5;
 }
 
 .badge.medium {
-  background: #fffaeb;
-  color: #b54708;
+  background: #3b2a14;
+  color: #fdba74;
 }
 
 .badge.low {
-  background: #f2f4f7;
-  color: #475467;
-}
-
-@media (prefers-color-scheme: dark) {
-  .badge.p0,
-  .badge.high {
-    background: #3f1d1d;
-    color: #fca5a5;
-  }
-  .badge.medium {
-    background: #3b2a14;
-    color: #fdba74;
-  }
-  .badge.low {
-    background: #273449;
-    color: #9ca3af;
-  }
+  background: #273449;
+  color: #9ca3af;
 }
 
 .when {
