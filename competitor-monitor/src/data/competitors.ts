@@ -142,6 +142,21 @@ export const COMPETITORS: Competitor[] = [
     threatNotes: '同公司产品。P1 监控重点是功能边界是否继续逼近 WorkBuddy 的企业/深度办公场景。'
   },
   {
+    id: 'chatgpt',
+    name: 'ChatGPT 桌面客户端',
+    vendor: 'OpenAI',
+    priority: 'P1',
+    region: 'global',
+    posture: 'Chat + Work + Codex 三合一桌面 Agent',
+    summary:
+      '2026 年 7 月 9 日，新版 ChatGPT 桌面端在 macOS / Windows 上把 Chat（对话）、Work（调研与交付物）和 Codex（软件开发）收进同一个应用。Work 经授权可使用本地文件和桌面应用，并带内置浏览器；旧版桌面端改名为 ChatGPT Classic。Linux 预览版已放出。',
+    website: 'https://chatgpt.com/download',
+    watchUrl: 'https://help.openai.com/en/articles/6825453-release-notes',
+    watchLabel: 'ChatGPT Release Notes',
+    threatNotes:
+      '全球默认入口。桌面端已能做本地文件、电脑操作、跨端续跑，并从 Claude Cowork / Cursor 导入 skills 与项目。品牌与分发都强于大多数办公 Agent，应至少按 P1 盯；若你们对标「电脑上的默认 AI 同事」，可升到 P0。'
+  },
+  {
     id: 'manus',
     name: 'Manus',
     vendor: 'Meta（收购）',
