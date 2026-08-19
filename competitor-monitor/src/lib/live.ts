@@ -1,4 +1,3 @@
-import { COMPETITORS } from '../data/competitors'
 import type { UpdateItem } from '../types'
 
 interface GithubRelease {
@@ -47,8 +46,6 @@ export async function fetchOpenClawUpdates(signal?: AbortSignal): Promise<Update
 }
 
 export function mergeLiveUpdates(base: UpdateItem[], live: UpdateItem[]): UpdateItem[] {
-  const openclaw = COMPETITORS.find((item) => item.id === 'openclaw')
-  if (!openclaw) return base
   const withoutSeedOpenclaw = base.filter((item) => item.competitorId !== 'openclaw')
   return [...withoutSeedOpenclaw, ...live]
 }

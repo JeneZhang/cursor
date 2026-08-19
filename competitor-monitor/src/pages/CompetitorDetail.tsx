@@ -1,11 +1,12 @@
 import { Link, useParams } from 'react-router-dom'
-import { competitorById } from '../data/competitors'
 import { UPDATES } from '../data/updates'
 import { UpdateCard } from '../components/UpdateCard'
+import { useCatalog } from '../lib/catalog-context'
 
 export function CompetitorDetailPage() {
   const { id = '' } = useParams()
-  const competitor = competitorById[id]
+  const { byId } = useCatalog()
+  const competitor = byId[id]
   const updates = UPDATES.filter((item) => item.competitorId === id)
 
   if (!competitor) {
@@ -32,12 +33,19 @@ export function CompetitorDetailPage() {
           <p>{competitor.summary}</p>
           <p className="muted">{competitor.threatNotes}</p>
           <div className="detail-actions">
-            <a className="nav-link" href={competitor.website} target="_blank" rel="noreferrer">
-              官网
-            </a>
-            <a className="nav-link" href={competitor.watchUrl} target="_blank" rel="noreferrer">
-              {competitor.watchLabel}
-            </a>
+            {competitor.website ? (
+              <a className="nav-link" href={competitor.website} target="_blank" rel="noreferrer">
+                官网
+              </a>
+            ) : null}
+            {competitor.watchUrl ? (
+              <a className="nav-link" href={competitor.watchUrl} target="_blank" rel="noreferrer">
+                {competitor.watchLabel || '监控页'}
+              </a>
+            ) : null}
+            <Link className="nav-link" to={`/competitors/${competitor.id}/edit`}>
+              编辑
+            </Link>
             <Link className="nav-link" to="/competitors">
               返回列表
             </Link>

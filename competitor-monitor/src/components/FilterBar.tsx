@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { COMPETITORS } from '../data/competitors'
 import { KIND_LABEL } from '../lib/format'
 import { allowedCompetitorIds, type FeedQuery } from '../lib/filters'
-import type { Impact, Priority, UpdateKind } from '../types'
+import { useCatalog } from '../lib/catalog-context'
+import type { Impact, PriorityFilter, UpdateKind } from '../types'
 
 interface Props {
   query: FeedQuery
@@ -11,7 +11,10 @@ interface Props {
 }
 
 export function FilterBar({ query, onChange, action }: Props) {
-  const competitors = COMPETITORS.filter((item) => allowedCompetitorIds(query.priority).has(item.id))
+  const { competitors } = useCatalog()
+  const visibleCompetitors = competitors.filter((item) =>
+    allowedCompetitorIds(competitors, query.priority).has(item.id)
+  )
 
   return (
     <div className="filters">
@@ -26,11 +29,14 @@ export function FilterBar({ query, onChange, action }: Props) {
         value={query.priority}
         aria-label="优先级"
         onChange={(event) =>
-          onChange({ ...query, priority: event.target.value as Priority | 'all', competitorId: 'all' })
+          onChange({ ...query, priority: event.target.value as PriorityFilter, competitorId: 'all' })
         }
       >
+        <option value="focus">P0 + P1</option>
+        <option value="P0">只看 P0</option>
         <option value="P1">只看 P1</option>
-        <option value="all">P1 + P2</option>
+        <option value="P2">只看 P2</option>
+        <option value="all">全部优先级</option>
       </select>
       <select
         value={query.competitorId}
@@ -38,7 +44,7 @@ export function FilterBar({ query, onChange, action }: Props) {
         onChange={(event) => onChange({ ...query, competitorId: event.target.value })}
       >
         <option value="all">全部竞品</option>
-        {competitors.map((item) => (
+        {visibleCompetitors.map((item) => (
           <option key={item.id} value={item.id}>
             {item.name}
           </option>

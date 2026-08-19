@@ -4,15 +4,17 @@ import { FilterBar } from '../components/FilterBar'
 import { UpdateCard } from '../components/UpdateCard'
 import { DEFAULT_QUERY, filterUpdates, type FeedQuery } from '../lib/filters'
 import { fetchOpenClawUpdates, mergeLiveUpdates } from '../lib/live'
+import { useCatalog } from '../lib/catalog-context'
 import type { UpdateItem } from '../types'
 
 export function FeedPage() {
+  const { competitors } = useCatalog()
   const [query, setQuery] = useState<FeedQuery>(DEFAULT_QUERY)
   const [items, setItems] = useState<UpdateItem[]>(UPDATES)
   const [status, setStatus] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const visible = useMemo(() => filterUpdates(items, query), [items, query])
+  const visible = useMemo(() => filterUpdates(items, query, competitors), [items, query, competitors])
 
   async function syncGithub() {
     setBusy(true)

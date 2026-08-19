@@ -1,4 +1,5 @@
-export type Priority = 'P1' | 'P2'
+export type Priority = 'P0' | 'P1' | 'P2'
+export type PriorityFilter = Priority | 'focus' | 'all'
 export type Region = 'cn' | 'global'
 export type Impact = 'high' | 'medium' | 'low'
 
@@ -25,6 +26,8 @@ export interface Competitor {
   watchLabel: string
   threatNotes: string
 }
+
+export type CompetitorDraft = Omit<Competitor, 'id'>
 
 export interface UpdateItem {
   id: string

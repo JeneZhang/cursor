@@ -340,6 +340,11 @@ button:disabled {
   color: var(--ok);
 }
 
+.badge.p0 {
+  background: #fee4e2;
+  color: #b42318;
+}
+
 .badge.done,
 .badge.p2 {
   background: var(--row-hover);
@@ -362,6 +367,7 @@ button:disabled {
 }
 
 @media (prefers-color-scheme: dark) {
+  .badge.p0,
   .badge.high {
     background: #3f1d1d;
     color: #fca5a5;
@@ -385,6 +391,51 @@ button:disabled {
 .detail,
 .form {
   padding: 16px;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  max-width: 640px;
+}
+
+.form label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.form input,
+.form select,
+.form textarea,
+.competitor-table select {
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.form .banner {
+  margin: 0;
+}
+
+.form button.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
 }
 
 .detail h2 {

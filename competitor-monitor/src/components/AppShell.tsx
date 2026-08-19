@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {link.label}
           </NavLink>
         ))}
-        <div className="path">P1 · 办公 Agent</div>
+        <div className="path">P0 / P1 / P2</div>
       </header>
       <div className="page">{children}</div>
     </div>

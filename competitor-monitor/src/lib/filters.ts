@@ -1,10 +1,10 @@
 import { COMPETITORS } from '../data/competitors'
 import { UPDATES } from '../data/updates'
 import { inLastDays } from './format'
-import type { Impact, Priority, UpdateItem, UpdateKind } from '../types'
+import type { Competitor, Impact, PriorityFilter, UpdateItem, UpdateKind } from '../types'
 
 export interface FeedQuery {
-  priority: Priority | 'all'
+  priority: PriorityFilter
   competitorId: string | 'all'
   kind: UpdateKind | 'all'
   impact: Impact | 'all'
@@ -13,7 +13,7 @@ export interface FeedQuery {
 }
 
 export const DEFAULT_QUERY: FeedQuery = {
-  priority: 'P1',
+  priority: 'focus',
   competitorId: 'all',
   kind: 'all',
   impact: 'all',
@@ -21,13 +21,22 @@ export const DEFAULT_QUERY: FeedQuery = {
   q: ''
 }
 
-export function allowedCompetitorIds(priority: Priority | 'all'): Set<string> {
-  if (priority === 'all') return new Set(COMPETITORS.map((item) => item.id))
-  return new Set(COMPETITORS.filter((item) => item.priority === priority).map((item) => item.id))
+export function matchesPriority(item: Competitor, priority: PriorityFilter): boolean {
+  if (priority === 'all') return true
+  if (priority === 'focus') return item.priority === 'P0' || item.priority === 'P1'
+  return item.priority === priority
 }
 
-export function filterUpdates(items: UpdateItem[], query: FeedQuery): UpdateItem[] {
-  const allowed = allowedCompetitorIds(query.priority)
+export function allowedCompetitorIds(competitors: Competitor[], priority: PriorityFilter): Set<string> {
+  return new Set(competitors.filter((item) => matchesPriority(item, priority)).map((item) => item.id))
+}
+
+export function filterUpdates(
+  items: UpdateItem[],
+  query: FeedQuery,
+  competitors: Competitor[] = COMPETITORS
+): UpdateItem[] {
+  const allowed = allowedCompetitorIds(competitors, query.priority)
   const needle = query.q.trim().toLowerCase()
 
   return items
@@ -44,15 +53,21 @@ export function filterUpdates(items: UpdateItem[], query: FeedQuery): UpdateItem
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt) || a.title.localeCompare(b.title, 'zh'))
 }
 
-export function dashboardStats(now = new Date()) {
-  const p1Ids = allowedCompetitorIds('P1')
-  const p1Updates = UPDATES.filter((item) => p1Ids.has(item.competitorId))
-  const week = p1Updates.filter((item) => inLastDays(item.publishedAt, 7, now))
+export function dashboardStats(
+  competitors: Competitor[] = COMPETITORS,
+  updates: UpdateItem[] = UPDATES,
+  now = new Date()
+) {
+  const focusIds = allowedCompetitorIds(competitors, 'focus')
+  const focusUpdates = updates.filter((item) => focusIds.has(item.competitorId))
+  const week = focusUpdates.filter((item) => inLastDays(item.publishedAt, 7, now))
   const high = week.filter((item) => item.impact === 'high')
   const active = new Set(week.map((item) => item.competitorId)).size
 
   return {
-    p1Count: p1Ids.size,
+    p0Count: competitors.filter((item) => item.priority === 'P0').length,
+    p1Count: competitors.filter((item) => item.priority === 'P1').length,
+    p2Count: competitors.filter((item) => item.priority === 'P2').length,
     weekCount: week.length,
     highCount: high.length,
     activeCompetitors: active

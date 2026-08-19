@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { competitorById } from '../data/competitors'
 import { IMPACT_LABEL, KIND_LABEL, formatDate } from '../lib/format'
+import { useCatalog } from '../lib/catalog-context'
 import type { UpdateItem } from '../types'
 
 export function UpdateCard({ item }: { item: UpdateItem }) {
-  const competitor = competitorById[item.competitorId]
+  const { byId } = useCatalog()
+  const competitor = byId[item.competitorId] ?? competitorById[item.competitorId]
   return (
     <article className="update-row">
       <div className="meta-row">

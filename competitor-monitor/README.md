@@ -6,9 +6,9 @@
 
 ## P1 范围
 
-- **总览**：P1 竞品数、近 7 天动态、高影响条数
+- **总览**：P0 / P1 数量、近 7 天动态、高影响条数
 - **动态流**：按竞品 / 类型 / 影响 / 时间 / 关键词筛选
-- **竞品台账与详情**：产品姿态、威胁判断、相关动态
+- **竞品台账**：新建 / 编辑竞品，手动设置 **P0 / P1 / P2**（保存在浏览器 localStorage）
 - **监控源**：官方 changelog、博客、GitHub Releases
 - **同步**：动态页可拉取 OpenClaw 的 GitHub Releases（浏览器可直接访问 GitHub API）
 
@@ -16,7 +16,7 @@
 
 Claude Cowork、TraeWork、Kimi Work、千问办公、豆包工作任务、OpenClaw、Microsoft 365 Copilot、Gemini Spark、Genspark GenOffice、QClaw。
 
-Manus 放在 P2，默认隐藏。
+默认列表里直接竞品为 P1，Manus 为 P2。可在「竞品」页改优先级或新增条目。动态流默认看 P0+P1。
 
 ## 未做（P2）
 

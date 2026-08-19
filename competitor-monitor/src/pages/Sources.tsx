@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { competitorById } from '../data/competitors'
 import { SOURCES } from '../data/sources'
+import { useCatalog } from '../lib/catalog-context'
 
 export function SourcesPage() {
+  const { byId } = useCatalog()
   return (
     <>
       <div className="filters">
@@ -11,7 +12,7 @@ export function SourcesPage() {
       <div className="panel fill">
         <div className="source-list">
           {SOURCES.map((source) => {
-            const competitor = competitorById[source.competitorId]
+            const competitor = byId[source.competitorId]
             return (
               <div className="source-row" key={source.id}>
                 <div>
