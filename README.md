@@ -1,5 +1,12 @@
 # Markdown Todo Desktop
 
+This repository currently contains two apps:
+
+- **Markdown Todo Desktop** — Electron + React todo app backed by `todos.md` (original project)
+- **[办公 Agent 情报台](./competitor-monitor/README.md)** — P1 website for monitoring office-agent competitor updates
+
+---
+
 A Mac-friendly **Electron + React + TypeScript** desktop app that stores todos in a single human-readable Markdown file (`todos.md`).
 
 ## Prerequisites
