@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { CompetitorMark } from '../components/CompetitorMark'
 import { COMPETITORS } from '../data/competitors'
 import { UPDATES } from '../data/updates'
 
@@ -26,9 +27,12 @@ export function CompetitorsPage() {
               <tr key={item.id}>
                 <td>{item.priority}</td>
                 <td>
-                  <Link className="name" to={`/competitors/${item.id}`}>
-                    {item.name}
-                  </Link>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <CompetitorMark id={item.id} />
+                    <Link className="name" to={`/competitors/${item.id}`}>
+                      {item.name}
+                    </Link>
+                  </div>
                 </td>
                 <td>{item.vendor}</td>
                 <td>{item.posture}</td>

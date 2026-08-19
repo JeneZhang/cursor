@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { CompetitorMark } from '../components/CompetitorMark'
 import { competitorById } from '../data/competitors'
 import { UPDATES } from '../data/updates'
 import { UpdateCard } from '../components/UpdateCard'
@@ -25,7 +26,10 @@ export function CompetitorDetailPage() {
         <p className="muted">
           {competitor.priority} · {competitor.region === 'cn' ? '国内' : '国际'} · {competitor.vendor}
         </p>
-        <h2 style={{ fontFamily: 'var(--serif)', marginTop: 4 }}>{competitor.name}</h2>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', margin: '8px 0 12px' }}>
+          <CompetitorMark id={competitor.id} />
+          <h2 style={{ fontFamily: 'var(--serif)', margin: 0 }}>{competitor.name}</h2>
+        </div>
         <p>{competitor.summary}</p>
         <p>
           <strong>威胁判断</strong>
