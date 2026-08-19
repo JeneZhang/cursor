@@ -70,5 +70,19 @@ export const SOURCES: WatchSource[] = [
     label: 'Genspark 官网',
     url: 'https://www.genspark.ai',
     cadence: '随发布'
+  },
+  {
+    id: 'chatgpt-notes',
+    competitorId: 'chatgpt',
+    label: 'ChatGPT Release Notes',
+    url: 'https://help.openai.com/en/articles/6825453-release-notes',
+    cadence: '随发布'
+  },
+  {
+    id: 'chatgpt-whats-new',
+    competitorId: 'chatgpt',
+    label: 'ChatGPT What’s new',
+    url: 'https://learn.chatgpt.com/docs/whats-new',
+    cadence: '周更'
   }
 ]
