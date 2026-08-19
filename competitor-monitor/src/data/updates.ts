@@ -2,6 +2,61 @@ import type { UpdateItem } from '../types'
 
 export const UPDATES: UpdateItem[] = [
   {
+    //test comment
+    id: 'chatgpt-linux',
+    competitorId: 'chatgpt',
+    publishedAt: '2026-08-12',
+    kind: 'channel',
+    impact: 'medium',
+    title: 'ChatGPT 桌面端推出 Linux 预览',
+    summary:
+      '提供 Ubuntu/Debian 的 .deb 与 Fedora 的 .rpm，支持 x64 与 ARM64。可登录处理项目、本地文件和 Codex；Computer Use 在 Linux 预览中尚未提供。',
+    whyItMatters: '桌面覆盖面从 Mac/Windows 扩到 Linux，开发者与政企桌面都会被算进同一套 Chat/Work/Codex 入口。',
+    sourceLabel: 'ChatGPT Learn / What’s new',
+    sourceUrl: 'https://learn.chatgpt.com/docs/whats-new'
+  },
+  {
+    id: 'chatgpt-import-agents',
+    competitorId: 'chatgpt',
+    publishedAt: '2026-08-10',
+    kind: 'ecosystem',
+    impact: 'high',
+    title: '桌面端可从 Claude Code、Cowork、Cursor 导入 Agent 配置',
+    summary:
+      '可导入 instructions、settings、skills、plugins、projects 和近期工作，并在 Settings > Import 打开自动同步。',
+    whyItMatters:
+      '这是在挖走已经养成的 Agent 工作流。WorkBuddy / OpenClaw skills 用户迁移成本被主动打掉。',
+    sourceLabel: 'ChatGPT Learn / What’s new',
+    sourceUrl: 'https://learn.chatgpt.com/docs/whats-new'
+  },
+  {
+    id: 'chatgpt-atlas-sunset',
+    competitorId: 'chatgpt',
+    publishedAt: '2026-08-09',
+    kind: 'channel',
+    impact: 'medium',
+    title: 'Atlas 浏览器停用，Agent 浏览能力并入 ChatGPT 桌面端',
+    summary:
+      'Atlas 于 2026-08-09 停止工作。书签/标签不会自动迁移；Cookie 与密码可导出到 ChatGPT 桌面端。官方引导用桌面端内置浏览器做更深的网页 Agent 工作。',
+    whyItMatters: 'OpenAI 把「能操作网页的 Agent」收拢到桌面客户端，而不是单独浏览器产品。',
+    sourceLabel: 'ChatGPT Release Notes',
+    sourceUrl: 'https://help.openai.com/en/articles/6825453-release-notes'
+  },
+  {
+    id: 'chatgpt-desktop-unified',
+    competitorId: 'chatgpt',
+    publishedAt: '2026-07-09',
+    kind: 'product',
+    impact: 'high',
+    title: '新版 ChatGPT 桌面端合并 Chat、Work、Codex',
+    summary:
+      'macOS / Windows 全球推出。Work 做调研和文档/表格/幻灯片等交付物，授权后可用本地文件与桌面应用，并带内置浏览器。Codex 从独立应用并入，支持 diff 内联编辑、PR 侧栏审查、GPT-5.6 Computer Use。所有套餐含 Free。旧版改名为 ChatGPT Classic。',
+    whyItMatters:
+      '从「网页聊天」变成「电脑上的默认 Agent 工作台」，直接对上 WorkBuddy / Cowork / Kimi Work 的桌面形态。',
+    sourceLabel: 'OpenAI',
+    sourceUrl: 'https://openai.com/index/chatgpt-for-your-most-ambitious-work/'
+  },
+  {
     id: 'kimi-320',
     competitorId: 'kimi-work',
     publishedAt: '2026-08-19',
