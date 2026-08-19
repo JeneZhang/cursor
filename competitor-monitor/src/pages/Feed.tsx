@@ -20,7 +20,7 @@ export function FeedPage() {
     try {
       const live = await fetchOpenClawUpdates()
       setItems(mergeLiveUpdates(UPDATES, live))
-      setStatus(`已同步 OpenClaw GitHub ${live.length} 条。其它竞品仍使用人工核对过的条目。`)
+      setStatus(`已同步 OpenClaw GitHub ${live.length} 条。其它竞品仍使用已核对条目。`)
     } catch (error) {
       setStatus(error instanceof Error ? error.message : '同步失败')
     } finally {
@@ -29,26 +29,30 @@ export function FeedPage() {
   }
 
   return (
-    <div>
-      <div className="section-head">
-        <h2>动态流</h2>
-        <button type="button" className="btn" onClick={() => void syncGithub()} disabled={busy}>
-          {busy ? '同步中…' : '同步 OpenClaw GitHub'}
-        </button>
-      </div>
-      {status ? <div className="notice">{status}</div> : null}
-      <FilterBar query={query} onChange={setQuery} />
-      <p className="muted">
-        {visible.length} 条结果
-        {query.priority === 'P1' ? ' · 已隐藏 P2' : ''}
-      </p>
-      <div className="feed">
+    <>
+      <FilterBar
+        query={query}
+        onChange={setQuery}
+        action={
+          <button type="button" className="primary" onClick={() => void syncGithub()} disabled={busy}>
+            {busy ? '同步中…' : '同步 OpenClaw GitHub'}
+          </button>
+        }
+      />
+      {status ? <div className="banner warn">{status}</div> : null}
+      <div className="panel fill">
         {visible.length === 0 ? (
-          <div className="empty">没有匹配的动态。试试放宽时间或竞品筛选。</div>
+          <div className="empty">
+            <p>没有匹配的动态。试试放宽筛选。</p>
+          </div>
         ) : (
-          visible.map((item) => <UpdateCard key={item.id} item={item} />)
+          <div className="update-list">
+            {visible.map((item) => (
+              <UpdateCard key={item.id} item={item} />
+            ))}
+          </div>
         )}
       </div>
-    </div>
+    </>
   )
 }

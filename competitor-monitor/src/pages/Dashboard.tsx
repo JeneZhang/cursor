@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { COMPETITORS } from '../data/competitors'
 import { UPDATES } from '../data/updates'
@@ -7,7 +7,6 @@ import { UpdateCard } from '../components/UpdateCard'
 
 export function DashboardPage() {
   const stats = useMemo(() => dashboardStats(), [])
-  const [liveNote, setLiveNote] = useState<string | null>(null)
   const highWeek = useMemo(
     () =>
       filterUpdates(UPDATES, {
@@ -20,62 +19,63 @@ export function DashboardPage() {
   const p1 = COMPETITORS.filter((item) => item.priority === 'P1')
 
   return (
-    <div>
-      <div className="stat-strip">
-        <div className="stat">
-          <div className="label">P1 竞品</div>
-          <div className="value">{stats.p1Count}</div>
-        </div>
-        <div className="stat">
-          <div className="label">近 7 天动态</div>
-          <div className="value">{stats.weekCount}</div>
-        </div>
-        <div className="stat">
-          <div className="label">高影响</div>
-          <div className="value">{stats.highCount}</div>
-        </div>
-        <div className="stat">
-          <div className="label">本周有更新的竞品</div>
-          <div className="value">{stats.activeCompetitors}</div>
+    <>
+      <div className="page-pad" style={{ paddingBottom: 0 }}>
+        <div className="stats">
+          <div className="stat">
+            <div className="label">P1 竞品</div>
+            <div className="value">{stats.p1Count}</div>
+          </div>
+          <div className="stat">
+            <div className="label">近 7 天动态</div>
+            <div className="value">{stats.weekCount}</div>
+          </div>
+          <div className="stat">
+            <div className="label">高影响</div>
+            <div className="value">{stats.highCount}</div>
+          </div>
+          <div className="stat">
+            <div className="label">本周有更新</div>
+            <div className="value">{stats.activeCompetitors}</div>
+          </div>
         </div>
       </div>
-
-      <div className="grid-2">
-        <section>
-          <div className="section-head">
-            <h2>本周必须看</h2>
-            <Link to="/feed">全部动态 →</Link>
+      <div className="main">
+        <section className="panel">
+          <div className="panel-head">
+            <h2>本周高影响</h2>
+            <Link to="/feed">全部动态</Link>
           </div>
-          {liveNote ? <div className="notice">{liveNote}</div> : null}
-          <div className="feed">
-            {highWeek.length === 0 ? (
-              <div className="empty">近 7 天没有标记为高影响的 P1 动态。</div>
-            ) : (
-              highWeek.map((item) => <UpdateCard key={item.id} item={item} />)
-            )}
+          {highWeek.length === 0 ? (
+            <div className="empty">近 7 天没有高影响的 P1 动态。</div>
+          ) : (
+            <div className="update-list">
+              {highWeek.map((item) => (
+                <UpdateCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
+        </section>
+        <section className="panel">
+          <div className="panel-head">
+            <h2>P1 竞品</h2>
+            <Link to="/competitors">完整列表</Link>
+          </div>
+          <div className="competitor-list">
+            {p1.map((item) => (
+              <div className="competitor-row" key={item.id}>
+                <div className="meta-row">
+                  <Link to={`/competitors/${item.id}`}>{item.name}</Link>
+                  <span className="badge p1">{item.priority}</span>
+                </div>
+                <p className="muted">
+                  {item.vendor} · {item.posture}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
-        <aside>
-          <div className="section-head">
-            <h2>P1 台账</h2>
-            <Link to="/competitors">完整列表 →</Link>
-          </div>
-          <div className="panel">
-            {p1.map((item) => (
-              <p key={item.id}>
-                <Link to={`/competitors/${item.id}`}>{item.name}</Link>
-                <br />
-                <span className="muted">
-                  {item.vendor} · {item.posture}
-                </span>
-              </p>
-            ))}
-            <button type="button" className="btn ghost" onClick={() => setLiveNote('请到「动态」页同步 OpenClaw GitHub Releases。')}>
-              如何同步公开源
-            </button>
-          </div>
-        </aside>
       </div>
-    </div>
+    </>
   )
 }
