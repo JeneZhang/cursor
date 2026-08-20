@@ -10,6 +10,7 @@ import {
   nextSpeed,
   scoreForGem
 } from './logic'
+import { type ThemeMode, paletteFor, type CanvasPalette } from '../theme'
 
 const WIDTH = 390
 const HEIGHT = 720
@@ -33,6 +34,8 @@ export class LaneDriftEngine {
   private nextId = 1
   private spawnTimer = 0
   private lastTs = 0
+  private theme: ThemeMode = 'dark'
+  private palette: CanvasPalette = paletteFor('dark')
   private player: Player = {
     lane: 1,
     displayLane: 1,
@@ -44,13 +47,19 @@ export class LaneDriftEngine {
   private readonly callbacks: EngineCallbacks
   private stars: { x: number; y: number; s: number; a: number }[] = []
 
-  constructor(canvas: HTMLCanvasElement, callbacks: EngineCallbacks, best = 0) {
+  constructor(canvas: HTMLCanvasElement, callbacks: EngineCallbacks, best = 0, theme: ThemeMode = 'dark') {
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('Canvas 2D unavailable')
     this.ctx = ctx
     this.callbacks = callbacks
     this.best = best
+    this.setTheme(theme)
     this.seedStars()
+  }
+
+  setTheme(theme: ThemeMode): void {
+    this.theme = theme
+    this.palette = paletteFor(theme)
   }
 
   getSnapshot(): GameSnapshot {
@@ -220,17 +229,17 @@ export class LaneDriftEngine {
   }
 
   private draw(ts: number): void {
-    const { ctx } = this
+    const { ctx, palette: p } = this
     const g = ctx.createLinearGradient(0, 0, 0, HEIGHT)
-    g.addColorStop(0, '#07131c')
-    g.addColorStop(0.55, '#0b1f2c')
-    g.addColorStop(1, '#102a24')
+    g.addColorStop(0, p.bg0)
+    g.addColorStop(0.55, p.bg1)
+    g.addColorStop(1, p.bg2)
     ctx.fillStyle = g
     ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
     for (const star of this.stars) {
-      ctx.globalAlpha = star.a
-      ctx.fillStyle = '#d7f3ff'
+      ctx.globalAlpha = this.theme === 'light' ? star.a * 0.45 : star.a
+      ctx.fillStyle = p.star
       ctx.beginPath()
       ctx.arc(star.x, star.y, star.s, 0, Math.PI * 2)
       ctx.fill()
@@ -242,9 +251,9 @@ export class LaneDriftEngine {
     const laneW = usable / 3
     for (let i = 0; i < 3; i++) {
       const x = PADDING + i * laneW
-      ctx.fillStyle = i === 1 ? 'rgba(56, 189, 160, 0.06)' : 'rgba(255,255,255,0.03)'
+      ctx.fillStyle = i === 1 ? p.laneMid : p.laneSide
       ctx.fillRect(x + 4, 0, laneW - 8, HEIGHT)
-      ctx.strokeStyle = 'rgba(120, 200, 180, 0.18)'
+      ctx.strokeStyle = p.laneLine
       ctx.lineWidth = 1
       ctx.beginPath()
       ctx.moveTo(x + 4, 0)
@@ -261,21 +270,21 @@ export class LaneDriftEngine {
         ctx.translate(x, entity.y)
         ctx.rotate(Math.PI / 4)
         ctx.scale(pulse, pulse)
-        ctx.fillStyle = '#f0b429'
-        ctx.shadowColor = 'rgba(240, 180, 41, 0.55)'
+        ctx.fillStyle = p.gem
+        ctx.shadowColor = p.gemGlow
         ctx.shadowBlur = 12
         ctx.fillRect(-entity.radius, -entity.radius, entity.radius * 2, entity.radius * 2)
         ctx.restore()
       } else {
         const w = laneW - 18
-        ctx.fillStyle = '#6d7f8d'
-        ctx.strokeStyle = '#9eb0bf'
+        ctx.fillStyle = p.gate
+        ctx.strokeStyle = p.gateStroke
         ctx.lineWidth = 2
         ctx.beginPath()
         roundRect(ctx, x - w / 2, entity.y - entity.height / 2, w, entity.height, 8)
         ctx.fill()
         ctx.stroke()
-        ctx.fillStyle = 'rgba(8, 16, 22, 0.35)'
+        ctx.fillStyle = p.gateInset
         ctx.fillRect(x - w / 2 + 8, entity.y - 4, w - 16, 8)
       }
     }
@@ -285,8 +294,8 @@ export class LaneDriftEngine {
     const bob = Math.sin(ts / 220) * 3
     ctx.save()
     ctx.translate(px, this.player.y + bob)
-    ctx.fillStyle = '#3fd0a8'
-    ctx.shadowColor = 'rgba(63, 208, 168, 0.55)'
+    ctx.fillStyle = p.player
+    ctx.shadowColor = p.playerGlow
     ctx.shadowBlur = 16
     ctx.beginPath()
     ctx.moveTo(0, -this.player.radius)
@@ -295,7 +304,7 @@ export class LaneDriftEngine {
     ctx.lineTo(-this.player.radius * 0.9, this.player.radius * 0.85)
     ctx.closePath()
     ctx.fill()
-    ctx.fillStyle = '#e8fff7'
+    ctx.fillStyle = p.playerCore
     ctx.beginPath()
     ctx.arc(0, -2, 4, 0, Math.PI * 2)
     ctx.fill()
@@ -304,7 +313,7 @@ export class LaneDriftEngine {
     // Soft vignette
     const vig = ctx.createRadialGradient(WIDTH / 2, HEIGHT / 2, HEIGHT * 0.2, WIDTH / 2, HEIGHT / 2, HEIGHT * 0.75)
     vig.addColorStop(0, 'rgba(0,0,0,0)')
-    vig.addColorStop(1, 'rgba(0,0,0,0.35)')
+    vig.addColorStop(1, p.vignette)
     ctx.fillStyle = vig
     ctx.fillRect(0, 0, WIDTH, HEIGHT)
   }

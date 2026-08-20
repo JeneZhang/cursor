@@ -1,4 +1,5 @@
 import { LaneDriftEngine } from './game/engine'
+import { THEME_KEY, nextTheme, parseTheme, type ThemeMode } from './theme'
 import './style.css'
 
 const BEST_KEY = 'lane-drift-best'
@@ -10,8 +11,21 @@ const overlayCopyEl = document.querySelector<HTMLParagraphElement>('#overlay-cop
 const startBtnEl = document.querySelector<HTMLButtonElement>('#start-btn')
 const scoreNode = document.querySelector<HTMLSpanElement>('#score')
 const bestNode = document.querySelector<HTMLElement>('#best')
+const themeToggleEl = document.querySelector<HTMLButtonElement>('#theme-toggle')
+const themeLabelEl = document.querySelector<HTMLSpanElement>('#theme-label')
+const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
 
-if (!canvasEl || !overlayEl || !overlayTitleEl || !overlayCopyEl || !startBtnEl || !scoreNode || !bestNode) {
+if (
+  !canvasEl ||
+  !overlayEl ||
+  !overlayTitleEl ||
+  !overlayCopyEl ||
+  !startBtnEl ||
+  !scoreNode ||
+  !bestNode ||
+  !themeToggleEl ||
+  !themeLabelEl
+) {
   throw new Error('Missing required DOM nodes')
 }
 
@@ -22,9 +36,30 @@ const overlayCopy = overlayCopyEl
 const startBtn = startBtnEl
 const scoreEl = scoreNode
 const bestEl = bestNode
+const themeToggle = themeToggleEl
+const themeLabel = themeLabelEl
 
 const savedBest = Number(localStorage.getItem(BEST_KEY) ?? '0') || 0
 bestEl.textContent = String(savedBest)
+
+let theme: ThemeMode = parseTheme(localStorage.getItem(THEME_KEY))
+
+function applyTheme(next: ThemeMode): void {
+  theme = next
+  document.documentElement.dataset.theme = next
+  localStorage.setItem(THEME_KEY, next)
+  const goingLight = next === 'light'
+  themeLabel.textContent = goingLight ? 'Dark' : 'Light'
+  themeToggle.setAttribute('aria-pressed', String(goingLight))
+  themeToggle.setAttribute(
+    'aria-label',
+    goingLight ? 'Switch to dark theme' : 'Switch to light theme'
+  )
+  if (themeColorMeta) {
+    themeColorMeta.content = goingLight ? '#eef7f4' : '#061018'
+  }
+  engine.setTheme(next)
+}
 
 const engine = new LaneDriftEngine(
   canvas,
@@ -46,8 +81,11 @@ const engine = new LaneDriftEngine(
       /* reserved */
     }
   },
-  savedBest
+  savedBest,
+  theme
 )
+
+applyTheme(theme)
 
 function begin(): void {
   overlay.classList.remove('visible')
@@ -59,6 +97,11 @@ function begin(): void {
 startBtn.addEventListener('click', (e) => {
   e.stopPropagation()
   begin()
+})
+
+themeToggle.addEventListener('click', (e) => {
+  e.stopPropagation()
+  applyTheme(nextTheme(theme))
 })
 
 let touchStartX: number | null = null

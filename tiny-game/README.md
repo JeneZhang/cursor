@@ -17,8 +17,9 @@ Open the URL Vite prints (default `http://localhost:5174`). On a phone, use your
 - **Mobile:** swipe left/right, or tap the left/right half of the screen
 - **Desktop:** `←` / `→` (or `A` / `D`); click left/right half of the canvas
 - **Start / restart:** Play button, `Enter`, or `Space`
+- **Theme:** use the Light / Dark switch in the top bar (saved in `localStorage`)
 
-Best score is stored in `localStorage`.
+Best score and theme preference are stored in `localStorage`.
 
 ## Scripts
 
