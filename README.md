@@ -1,9 +1,10 @@
 # Markdown Todo Desktop
 
-This repository currently contains two apps:
+This repository currently contains three apps:
 
 - **Markdown Todo Desktop** — Electron + React todo app backed by `todos.md` (original project)
 - **[办公 Agent 情报台](./competitor-monitor/README.md)** — P1 website for monitoring office-agent competitor updates
+- **[Lane Drift](./tiny-game/README.md)** — tiny mobile-first endless lane game (Vite + TypeScript)
 
 ---
 
