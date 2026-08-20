@@ -82,7 +82,9 @@ body {
   justify-content: space-between;
   gap: 12px;
   padding: 14px 18px 8px;
-  z-index: 2;
+  z-index: 4;
+  position: relative;
+  pointer-events: auto;
 }
 
 .brand {
