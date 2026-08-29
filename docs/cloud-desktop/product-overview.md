@@ -437,6 +437,37 @@ keycode 展开成 [小写, 大写]，`Á` 单独绑会变成 `á`。
 （`PingFang SC`、`Microsoft YaHei`、`Hiragino Sans`、`Noto Sans CJK`）的映射。
 这和"未装 Noto CJK"是同一个盲区的两面。
 
+#### 但它只是皮肤，不是 macOS
+
+这一点必须说清楚，因为它是个实际的坑：**系统本身完完全全是 Ubuntu 24.04 + XFCE，
+macOS 只存在于外观层。**
+
+| 是 macOS 的（纯视觉） | 不是 macOS 的（真实行为） |
+| --- | --- |
+| WhiteSur-Light 的 GTK / 图标 / 光标主题 | 内核是 Linux 6.12；无 `/System`、`/Library`、`/Applications` |
+| `macos-wallpaper.png` 壁纸 | 无 `sw_vers`、`osascript`、`defaults`、`pbcopy` |
+| 窗口按钮在左侧（`CHM\|O`）、标题居中 | 应用都是 ELF 二进制，不是 `.app` bundle |
+| Plank Dock | 文件管理器是 Thunar，不是 Finder；无 Spotlight、无 Mission Control |
+| 字体装在 `/usr/share/fonts/truetype/macos/` | 无全局菜单栏（`appmenu` 相关包 0 个），面板上只有应用菜单和时钟 |
+| 字体名替换表（`.SF NS`、`-apple-system` 等） | **快捷键是 Linux 习惯：Ctrl 而不是 Cmd** |
+
+最后一条最容易踩。实测在 Chrome 的输入框里：
+
+```
+Ctrl+A / Ctrl+C  →  剪贴板 = [copy-modifier-probe]   ✓ 生效
+Super+A / Super+C →  剪贴板 = [CLIPBOARD-WAS-CLEARED]  ✗ 无任何效果
+```
+
+`Super`（物理上 Cmd 键的位置）在这个桌面上被 XFCE 绑成了 Linux 风格的窗口/启动器快捷键——
+`Super+E` 开 Thunar、`Super+R` 开 appfinder、`Super+方向键` 平铺窗口——**不是修饰键**。
+computer-use 会把 `meta` 翻译成 `super`，所以对模型来说：
+**任何"复制/粘贴/全选/保存"都必须用 `ctrl`，用 `meta` 会静默无效。**
+终端里的复制粘贴还要再多一个 `shift`（`ctrl+shift+c` / `ctrl+shift+v`）。
+
+顺带一个印证设计意图的细节：VNC 会话名叫 **`AnyOS`**，配置文件叫 `anyos.conf`，
+而且已经支持 `light` / `dark` 两套外观参数。也就是说这一层从设计上就是
+"**可以换成任意 OS 外观的皮肤**"，macOS 只是当前选的那一套，而不是在模拟 macOS 系统。
+
 ---
 
 ## 5. 预装软件清单
