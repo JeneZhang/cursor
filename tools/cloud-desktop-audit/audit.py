@@ -38,7 +38,7 @@ XENV = {**os.environ, "DISPLAY": DISPLAY}
 # What the model sees. Mirrors API_WIDTH in the exec-daemon computer-use module.
 API_WIDTH = 1280
 
-SECTIONS = ("inventory", "fonts", "screenshot", "input", "typing", "capture")
+SECTIONS = ("inventory", "fonts", "screenshot", "fidelity", "settle", "input", "typing", "capture")
 
 
 # --------------------------------------------------------------------------
@@ -377,6 +377,254 @@ def print_screenshot(data):
         print(
             f"    {row['variant']:<38} {row['p50_ms']:>7.0f}m {row['min_ms']:>7.0f}m {row['max_ms']:>7.0f}m"
             f" {human_bytes(row['bytes']):>11} {human_bytes(row['base64_bytes']):>11}"
+        )
+
+
+# --------------------------------------------------------------------------
+# fidelity
+# --------------------------------------------------------------------------
+
+# Candidate widths for the image the model is shown. 1280 is what ships today.
+FIDELITY_WIDTHS = (960, 1280, 1536, 1920)
+
+
+def active_window_region(display_width, display_height):
+    """Geometry of the focused window, which is where the UI text lives.
+
+    Measuring fidelity over the whole framebuffer would mostly measure the
+    wallpaper, which no agent ever needs to read.
+    """
+    code, out, _ = run(["xdotool", "getactivewindow", "getwindowgeometry", "--shell"])
+    if code != 0:
+        return 0, 0, display_width, display_height
+    values = dict(line.split("=", 1) for line in out.strip().splitlines() if "=" in line)
+    try:
+        x, y = max(0, int(values["X"])), max(0, int(values["Y"]))
+        width, height = int(values["WIDTH"]), int(values["HEIGHT"])
+    except (KeyError, ValueError):
+        return 0, 0, display_width, display_height
+    # Clamp, and keep even dimensions so the scale filters stay happy.
+    width = min(width, display_width - x) & ~1
+    height = min(height, display_height - y) & ~1
+    if width < 64 or height < 64:
+        return 0, 0, display_width, display_height
+    return x, y, width, height
+
+
+def section_fidelity():
+    """How much of the desktop survives the downscale the model is shown.
+
+    Each candidate width is applied to a single captured frame, then blown back
+    up with nearest-neighbour so it can be compared pixel-for-pixel against the
+    original. The SSIM that comes back is a direct measure of what the model
+    can no longer see, and pixel count stands in for image token cost.
+    """
+    display = detect_display()
+    width, height = display["width"], display["height"]
+    raw = "/tmp/cloud-desktop-audit-raw.png"
+    code, _, err = run(
+        ["ffmpeg", "-loglevel", "error", "-f", "x11grab", "-video_size", f"{width}x{height}",
+         "-i", DISPLAY, "-frames:v", "1", "-y", raw]
+    )
+    if code != 0:
+        raise RuntimeError(f"framebuffer capture failed: {err[:200]}")
+
+    x, y, region_w, region_h = active_window_region(width, height)
+    _, name, _ = run(["xdotool", "getactivewindow", "getwindowname"])
+    reference = "/tmp/cloud-desktop-audit-region.png"
+    run(["ffmpeg", "-loglevel", "error", "-i", raw, "-vf", f"crop={region_w}:{region_h}:{x}:{y}", "-y", reference])
+
+    rows = []
+    for api_width in FIDELITY_WIDTHS:
+        api_height = round(height * api_width / width)
+        ratio = api_width / width
+        # Downscale the whole frame exactly as the screenshot pipeline does,
+        # then take the matching region back up to native size.
+        chain = (
+            f"scale={api_width}:{api_height},"
+            f"crop={round(region_w * ratio) & ~1}:{round(region_h * ratio) & ~1}"
+            f":{round(x * ratio)}:{round(y * ratio)},"
+            f"scale={region_w}:{region_h}:flags=neighbor"
+        )
+        candidate = f"/tmp/cloud-desktop-audit-rt-{api_width}.png"
+        code, _, err = run(["ffmpeg", "-loglevel", "error", "-i", raw, "-vf", chain, "-y", candidate])
+        if code != 0:
+            rows.append({"api_width": api_width, "error": err[:160]})
+            continue
+        # `stats_file=-` writes the per-frame line to stdout; the summary line
+        # ffmpeg logs at info level is suppressed by -loglevel error.
+        _, stats_out, stats_err = run(
+            ["ffmpeg", "-loglevel", "error", "-i", candidate, "-i", reference,
+             "-lavfi", "ssim=stats_file=-", "-f", "null", "-"]
+        )
+        match = re.search(r"All:([0-9.]+)", stats_out) or re.search(r"All:([0-9.]+)", stats_err)
+        rows.append(
+            {
+                "api_width": api_width,
+                "api_height": api_height,
+                "downscale": round(width / api_width, 3),
+                "ssim": round(float(match.group(1)), 4) if match else None,
+                "megapixels": round(api_width * api_height / 1e6, 2),
+                "current": api_width == API_WIDTH,
+            }
+        )
+
+    return {
+        "framebuffer": f"{width}x{height}",
+        "region": {"x": x, "y": y, "width": region_w, "height": region_h, "window": name.strip()},
+        "widths": rows,
+    }
+
+
+def print_fidelity(data):
+    region = data["region"]
+    print(f"  framebuffer {data['framebuffer']}, measured over the focused window only")
+    print(f"  region {region['width']}x{region['height']} at ({region['x']},{region['y']}): {region['window']!r}")
+    print(f"    {'api size':<14} {'downscale':>10} {'SSIM vs native':>15} {'megapixels':>11}")
+    for row in data["widths"]:
+        if "error" in row:
+            print(f"    {row['api_width']:<14} error: {row['error']}")
+            continue
+        marker = "  <- current" if row["current"] else ""
+        print(
+            f"    {row['api_width']}x{row['api_height']:<8} {row['downscale']:>10} {str(row['ssim']):>15}"
+            f" {row['megapixels']:>11}{marker}"
+        )
+
+
+# --------------------------------------------------------------------------
+# settle
+# --------------------------------------------------------------------------
+
+SETTLE_CAP_MS = 2000  # COMPUTER_USE_SCREENSHOT_SETTLE_DELAY_MS
+SETTLE_PROBE_SIZE = "480:300"
+SETTLE_STABLE_FRAMES = 3
+
+
+def grab_thumbnail():
+    """A small greyscale grab, cheap enough to poll with."""
+    code, payload, _ = run_bytes(
+        ["ffmpeg", "-loglevel", "error", "-f", "x11grab", "-video_size", "1920x1200",
+         "-i", DISPLAY, "-frames:v", "1", "-vf", f"scale={SETTLE_PROBE_SIZE}",
+         "-f", "rawvideo", "-pix_fmt", "gray", "pipe:1"]
+    )
+    return payload if code == 0 else b""
+
+
+def time_to_settle(trigger, budget_ms=4000):
+    """Milliseconds from `trigger` until the framebuffer stops changing.
+
+    Returns None if it never went quiet inside the budget.
+    """
+    start = time.perf_counter()
+    trigger()
+    previous = None
+    stable_since = None
+    stable_runs = 0
+    while (time.perf_counter() - start) * 1000 < budget_ms:
+        frame = grab_thumbnail()
+        now = time.perf_counter()
+        if frame and frame == previous:
+            stable_runs += 1
+            if stable_since is None:
+                stable_since = now
+            if stable_runs >= SETTLE_STABLE_FRAMES:
+                return (stable_since - start) * 1000
+        else:
+            stable_runs = 0
+            stable_since = None
+        previous = frame
+    return None
+
+
+def section_settle(repeats=4):
+    """How long the UI really needs, against the fixed delay that is waited.
+
+    The screenshot pipeline sleeps a constant 2000 ms after any input action
+    before it captures. Whether that is generous or stingy is an empirical
+    question, so it gets measured against real interactions in a real app.
+    """
+    grab_cost, _ = timed(grab_thumbnail, 5)
+    problems = []
+    sink = None
+    for build in (ChromeSink, TerminalSink):
+        candidate = build()
+        try:
+            sink = candidate.__enter__()
+            break
+        except RuntimeError as err:
+            candidate.__exit__(None, None, None)
+            problems.append(f"{build.__name__}: {err}")
+    if sink is None:
+        return {"error": "; ".join(problems), "interactions": []}
+
+    display = detect_display()
+    cx, cy = display["width"] // 2, display["height"] // 2
+    step = [0]
+
+    def click_somewhere():
+        step[0] += 1
+        x, y = cx + (step[0] * 23) % 200, cy + (step[0] * 17) % 150
+        run(["xdotool", "mousemove", "--sync", str(x), str(y), "click", "1"])
+
+    def type_a_word():
+        run(["xdotool", "type", "--delay", "12", "--", "settle"])
+
+    def press_a_key():
+        run(["xdotool", "key", "--clearmodifiers", "BackSpace"])
+
+    interactions = [
+        ("click inside the window", click_somewhere),
+        ("type a 6-character word", type_a_word),
+        ("single key press", press_a_key),
+    ]
+
+    rows = []
+    try:
+        for label, trigger in interactions:
+            samples = []
+            for _ in range(repeats):
+                sink.reset()
+                measured = time_to_settle(trigger)
+                if measured is not None:
+                    samples.append(measured)
+            rows.append(
+                {
+                    "interaction": label,
+                    "measured": len(samples),
+                    "attempts": repeats,
+                    **(stats(samples) if samples else {}),
+                }
+            )
+    finally:
+        sink.__exit__(None, None, None)
+
+    return {
+        "sink": type(sink).__name__,
+        "fixed_delay_ms": SETTLE_CAP_MS,
+        "probe_grab": stats(grab_cost),
+        "stable_frames_required": SETTLE_STABLE_FRAMES,
+        "interactions": rows,
+    }
+
+
+def print_settle(data):
+    if data.get("error"):
+        print(f"  skipped: {data['error']}")
+        return
+    grab_ms = data["probe_grab"]["p50_ms"]
+    print(f"  sink {data['sink']}, polling with a {SETTLE_PROBE_SIZE} grab costing p50 {grab_ms} ms")
+    print(f"  the pipeline waits a fixed {data['fixed_delay_ms']} ms instead of measuring this")
+    print(f"  figures are upper bounds: the poll only notices quiet one grab (~{grab_ms:.0f} ms) after it starts")
+    print(f"    {'interaction':<28} {'settled p50':>12} {'min':>8} {'max':>8}  vs fixed delay")
+    for row in data["interactions"]:
+        if "p50_ms" not in row:
+            print(f"    {row['interaction']:<28} never settled inside the budget")
+            continue
+        saved = data["fixed_delay_ms"] - row["p50_ms"]
+        print(
+            f"    {row['interaction']:<28} {row['p50_ms']:>11.0f}m {row['min_ms']:>7.0f}m {row['max_ms']:>7.0f}m"
+            f"  {saved:>6.0f} ms of the wait is idle"
         )
 
 
@@ -932,6 +1180,8 @@ RUNNERS = {
     "inventory": (section_inventory, print_inventory),
     "fonts": (section_fonts, print_fonts),
     "screenshot": (section_screenshot, print_screenshot),
+    "fidelity": (section_fidelity, print_fidelity),
+    "settle": (section_settle, print_settle),
     "input": (section_input, print_input),
     "typing": (section_typing, print_typing),
     "capture": (section_capture, print_capture),
@@ -940,15 +1190,16 @@ RUNNERS = {
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("sections", nargs="*", choices=SECTIONS, default=list(SECTIONS))
+    parser.add_argument("sections", nargs="*", choices=SECTIONS, help="default: every section")
     parser.add_argument("--json", metavar="PATH", help="also write raw results as JSON")
     args = parser.parse_args()
+    sections = args.sections or list(SECTIONS)
 
     if not shutil.which("xdpyinfo"):
         sys.exit("no X11 tooling found (xdpyinfo missing) - is this a cloud desktop image?")
 
     results = {"display": DISPLAY, "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
-    for name in args.sections:
+    for name in sections:
         collect, render = RUNNERS[name]
         print(f"\n=== {name} ===")
         try:
