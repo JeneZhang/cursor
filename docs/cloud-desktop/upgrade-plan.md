@@ -186,6 +186,36 @@ loop until 2000 ms 上限:
    `logLevel: warn`，现在只有 `pr_created` / `artifact_created` / `mcp_auth_error` 这些 kind）。
 2. 事件里带 **noVNC 的深链**，让用户一键进到那个桌面，而不是自己去找端口。
 3. 会话保持"我在等你"的状态，而不是看起来已经结束。
+4. **切换输入所有权**，见下。
+
+**(b2) 输入所有权：闸门已经在机器上了，只是没接线。** 人和 agent 的输入之间目前
+毫无仲裁：一个会话只有一个指针和一个键盘焦点，后写的覆盖前一个，人在 agent 打字中途点
+一下别的窗口就能把后续按键截走（实测 62 个字符里 44 个投递到了别的应用，
+详见 [`product-overview.md` §2.5](./product-overview.md)）。
+
+而 TigerVNC 支持按输入类别关闭 RFB 通道，并且**可以在运行时用 `vncconfig` 改**，
+实测能挡住人的输入而完全不影响 agent 的 XTEST 输入：
+
+```
+vncconfig -set AcceptPointerEvents=0   ->  人被挡住，agent 照常工作
+vncconfig -set AcceptPointerEvents=1   ->  人恢复
+```
+
+当前 `AcceptPointerEvents` / `AcceptKeyEvents` / `AcceptCutText` / `SendCutText`
+全是默认值 1，启动参数里一个都没设。所以可以直接做成两种明确的模式：
+
+| 模式 | 闸门 | 用在什么时候 |
+| --- | --- | --- |
+| agent 独占 | `AcceptPointerEvents=0`、`AcceptKeyEvents=0` | agent 正在执行动作序列，人只能看 |
+| 人接管 | 两者都 `=1`，同时 agent 暂停发动作 | 命中敏感策略、或用户主动要求接管 |
+
+关键在于**任何时刻只有一方持有输入权**，切换是显式的、有事件记录的。这样 §2.5 里那三个
+现象（拖拽落点被改、打字被截走、指针来源不可辨）就都不会发生。
+noVNC 客户端侧的 `view_only` 参数不能用来做这件事——那只是前端不发事件，
+换个客户端就绕过了；闸门必须在服务器侧。
+
+需要配套的一点：闸门关着的时候，人在 noVNC 里的操作会**静默失效**，这很容易被误认为
+卡住了。所以 UI 上必须显示当前是谁持有输入权。
 
 **(c) 敏感期间停止留存。** 把 secret 遮蔽扩展到像素是做不到的（通用的屏幕内容打码不现实），
 但可以做两件确定的事：处于策略标记的敏感状态时，**暂停截图落盘与产物上传**；

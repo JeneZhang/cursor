@@ -43,6 +43,30 @@ DISPLAY=:1 python3 tools/cloud-desktop-audit/audit.py --json /tmp/base.json # �
 
 如果 Chrome 起不来，会退化成 `xfce4-terminal` 里跑 `cat` 的兜底 sink。
 
+## 人机输入协调探测
+
+`input-coordination-probe.py` 单独回答一个问题：agent 的输入和人的输入怎么共存。
+
+agent 走 `xdotool`（XTEST 扩展），人走 VNC 的 RFB 协议——两条不同的代码路径，所以脚本里
+内置了一个最小 RFB 客户端来真实扮演"人"，而不是用 `xdotool` 假装。连接时 `shared=1`，
+不会把正在观看的人踢掉。
+
+```bash
+DISPLAY=:1 python3 tools/cloud-desktop-audit/input-coordination-probe.py            # pointer + gate
+DISPLAY=:1 python3 tools/cloud-desktop-audit/input-coordination-probe.py focus      # 需要两个窗口
+```
+
+| 探针 | 内容 |
+| --- | --- |
+| `pointer` | 人的输入是否生效；双方同时写指针会发生什么；人在 agent 拖拽中途插手的后果 |
+| `gate` | `AcceptPointerEvents` / `AcceptKeyEvents` 能否在运行时开关，能否只挡人不挡 agent |
+| `focus` | 人点一下别的窗口，会不会把 agent 正在打的字截走 |
+
+`focus` 会往当前焦点窗口打字，且需要屏幕上有一个标题以 `SINK|` 开头的窗口和另一个窗口，
+所以不在默认集合里，要显式指定。
+
+`gate` 会临时关闭再恢复 `AcceptPointerEvents`；即使中途失败也会在 `finally` 里恢复。
+
 ## 端到端示例
 
 `demo-desktop-session.sh` 把本仓库自己的 Electron 应用拉起在云端桌面上，并预置好
