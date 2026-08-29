@@ -40,3 +40,38 @@ Remotion 后处理"的设计相当漂亮；截图选无损 WebP 也是正确的�
 需要的 60 fps 全 I 帧），以及缺 Noto CJK 导致的中日韩字体回退质量问题。
 
 改完 P0/P1，一次"点击 + 截图"的往返从约 2245 ms 降到约 529 ms。
+
+## 术语表
+
+这几个词在三份文档里反复出现，含义都不是自解释的。
+
+**X 会话（X session）** — 一个 X server 实例（这台机器上是 `Xtigervnc :1`）加上连在它
+上面的所有图形程序，以及它们共享的那一套状态：窗口管理器、根窗口、唯一的鼠标指针、
+一张全局键盘映射表、剪贴板选区。命名是反直觉的：**X server 跑在有屏幕的那一侧**，
+应用程序是 **client**。所以这里 `Xtigervnc` 是 server，Chrome / Thunar / 被测应用、
+以及 agent 用的 `xdotool` 和 `ffmpeg` 全都是 client。会话是共享的、不隔离的——
+详见 [`product-overview.md` §3.2](./product-overview.md)。
+
+**帧缓冲（framebuffer）** — X server 里那块存着"屏幕当前长什么样"的内存，
+这台机器上是 1920×1200×24 位，约 9.2 MB。截图和录屏都是从这里读像素。
+
+**沉降（settle）** — 等界面画完。动作发出去之后应用还要处理事件、重排布局、播动画，
+这段时间里截图会拿到半更新的画面。代码里是 `COMPUTER_USE_SCREENSHOT_SETTLE_DELAY_MS`
+和 `actionRequiresSettle`，完整规则见 [`product-overview.md` §4.5](./product-overview.md)。
+
+**API 分辨率** — 模型在截图里看到的尺寸（1280×800），区别于帧缓冲的真实尺寸
+（1920×1200）。两者之间有固定的 1.5 倍缩放，坐标双向换算。
+
+**全 I 帧（all-intra）** — 视频里每一帧都是独立完整的关键帧，没有帧间预测。
+体积大得多，但可以跳到任意一帧而不用解码前面的内容——录屏后处理要任意取帧，所以选它。
+
+**keycode / keysym** — keycode 是物理按键编号（1~255 的整数），keysym 是它产生的字符
+或功能（`a`、`Return`、`U4F60`）。两者的对应关系就是那张全局键盘映射表。
+非 ASCII 打字要临时把 Unicode keysym 绑到空闲 keycode 上，这是丢字问题的源头。
+
+**strut** — 窗口向窗口管理器申报"请不要让别的窗口盖住我这一条"的机制
+（`_NET_WM_STRUT_PARTIAL`）。这台机器上顶部面板申报了 29px，**Plank Dock 没有申报**，
+所以最大化的窗口会延伸到 Dock 底下。
+
+**EWMH** — 窗口管理器之间的一套约定属性（`_NET_*`）。启动脚本靠检查根窗口上的
+`_NET_SUPPORTING_WM_CHECK` 来判断窗口管理器是否真的起来了，而不是只判断 X server 能连上。
