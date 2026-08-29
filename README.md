@@ -1,9 +1,10 @@
 # Markdown Todo Desktop
 
-This repository currently contains two apps:
+This repository currently contains three apps:
 
 - **Markdown Todo Desktop** — Electron + React todo app backed by `todos.md` (original project)
 - **[办公 Agent 情报台](./competitor-monitor/README.md)** — P1 website for monitoring office-agent competitor updates
+- **[2048 小游戏](./game-2048/README.md)** — browser 2048 game with undo, board sizes, and keyboard/swipe controls
 
 ---
 
