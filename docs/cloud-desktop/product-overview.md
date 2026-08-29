@@ -110,6 +110,7 @@ computer-use 暴露 **11 种动作**：
 | 按键提示 | 组合键与输入内容以提示条形式叠在画面上 |
 | 自动缩放 | 按"重要性"给动作打分自动推近镜头，节流到每分钟最多 8 次、最短间隔 1.5 秒 |
 | 空闲加速 | 空闲段分类为加载等待 / 思考停顿 / 查看结果，只加速前两类 |
+| 片头片尾 | 开场推拉镜头，结尾一张带 Cursor 标志的黑底卡片 |
 | 交付 | 重编码后放 `/opt/cursor/artifacts/`，文件名可指定 |
 
 实测一段 34 秒会话的成片是 1920x1200 @ 60 fps、**4.08 MB**。
@@ -117,6 +118,26 @@ computer-use 暴露 **11 种动作**：
 之所以采集阶段用全 I 帧（`keyint=1:min-keyint=1:scenecut=0:bframes=0`），是因为后处理要
 按任意时间点取帧做缩放和变速；帧间预测会让随机取帧变得很贵。这条代理片的
 profile 版本号就叫 `render-proxy-h264-all-i-v1`。
+
+默认参数写在 `DEFAULT_PREPROCESSING_CONFIG` 里，**`record_screen` 工具没有暴露任何调节
+入口**——只有模式和文件名两个参数，剪辑风格是固定的：
+
+| 参数 | 默认值 | 含义 |
+| --- | --- | --- |
+| `zoomImportanceThreshold` | 60 | 动作重要性打分低于这个值不推镜头 |
+| `minZoomIntervalMs` | 1500 | 两次推镜头之间的最短间隔 |
+| `maxZoomsPerMinute` | 8 | 每分钟推镜头次数上限 |
+| `targetZoomDensity` | 0.3 | 目标上有多少比例的时间处于推近状态 |
+| `minSpeedupDurationMs` | 1000 | 短于 1 秒的空闲不加速 |
+| `cursorStyle` | `MELLOW` | 光标弹簧参数（tension 170 / friction 26 / mass 1） |
+| `speedUpLoadingWaits` / `speedUpThinkingPauses` | true | 加速加载等待与思考停顿 |
+| `preserveViewingResults` | true | **不**加速"在看结果"的那段 |
+
+**要注意这是重建，不是忠实录像。** 光标位置、点击时刻、按键内容全部来自输入事件日志，
+所以：不经过 computer-use 的指针移动（应用自己挪的、人在 noVNC 上操作的）在成片里
+没有光标；镜头推拉和变速会改变你对"这一步花了多久"的直观判断。
+**排查"应用为什么会那样"的时候，成片可能会误导你**——那种场景要看
+`/opt/cursor/recording-staging/` 里未经处理的代理片。
 
 ### 2.5 人机共享
 
