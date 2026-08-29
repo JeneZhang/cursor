@@ -107,6 +107,8 @@ DISPLAY=:1 python3 tools/cloud-desktop-audit/audit.py --json /tmp/baseline.json
 
 ## 3. 录屏是怎么实现的
 
+完整说明见 [`recording.md`](./recording.md)。这里只留和实测相关的骨架。
+
 采集：`-framerate <刷新率，默认 60> -draw_mouse 0 -f x11grab` →
 `scale=1920:-2:flags=lanczos,fps=60` → `libx264 -preset veryfast -crf 17`，
 并且 `keyint=1:min-keyint=1:scenecut=0:bframes=0`，即**全 I 帧**
@@ -247,8 +249,9 @@ sink 是一个真实的 GUI 输入框（Chrome 里铺满视口的 `textarea`，�
 
 画面越复杂越贵：另一次画面更满的测量里当前参数跑到 1.63 核 / 555 MiB 每分钟。
 
-值得对照的是**最终交付物很小**：本次 34 秒会话的成片是 1920x1200 @ 60 fps、
-**4.08 MB**。所以昂贵的是 staging 阶段，不是交付物。
+值得对照的是**最终交付物很小**：本次采集 139 秒，压成 32 秒正片 + 2 秒片尾，
+成片是 1920x1200 @ 60 fps、**4.08 MB**。所以昂贵的是 staging 阶段，不是交付物。
+完整链路见 [`recording.md`](./recording.md)。
 
 而且成本不只是磁盘：在 4 vCPU 的机器上，编码器要和被测应用抢 CPU，于是"录着屏跑的
 GUI 测试"和"不录屏跑的"时序不一样——录屏这个动作本身影响了它记录的对象。

@@ -6,12 +6,14 @@
 | 文档 | 内容 |
 | --- | --- |
 | [`product-overview.md`](./product-overview.md) | 产品文档：能力清单、架构、每个设计选择的理由，以及预装软件全清单与"为什么装它" |
+| [`recording.md`](./recording.md) | 录制能力专文：采集、事件日志、后处理、重建语义、成本与边界 |
 | [`current-state.md`](./current-state.md) | 实测数据：八组测量与缺陷分析 |
 | [`upgrade-plan.md`](./upgrade-plan.md) | 升级方案：按优先级排的改造项，每项含根因、改法、预期收益、验证方式、风险 |
 | [`../../tools/cloud-desktop-audit/`](../../tools/cloud-desktop-audit/) | 产生这些数据的脚本，以及一个可复现的端到端桌面示例 |
 
 先看 `product-overview.md` 了解这套东西是什么、怎么搭的、为什么这么搭；
-再看 `current-state.md` 看它跑起来的真实表现；最后看 `upgrade-plan.md` 看要改什么。
+录制这一条单独看 `recording.md`；再看 `current-state.md` 看它跑起来的真实表现；
+最后看 `upgrade-plan.md` 看要改什么。
 
 ## 复现
 
@@ -64,6 +66,14 @@ Remotion 后处理"的设计相当漂亮；截图选无损 WebP 也是正确的�
 
 **全 I 帧（all-intra）** — 视频里每一帧都是独立完整的关键帧，没有帧间预测。
 体积大得多，但可以跳到任意一帧而不用解码前面的内容——录屏后处理要任意取帧，所以选它。
+
+**代理片（render proxy）** — 采集阶段写下的那条未剪辑 H.264，profile 叫
+`render-proxy-h264-all-i-v1`，落在 `/opt/cursor/recording-staging/`。
+后处理从它任意取帧；它本身不上传。详见 [`recording.md`](./recording.md)。
+
+**重建（reconstruction）** — 成片里的光标、点击波纹、按键条不是屏幕上当时的样子，
+而是按 `InputEventLogger` 的事件日志画出来的。人在 noVNC 上的操作、应用自己挪的
+指针，成片里都没有。排查行为要用代理片，不要用成片。
 
 **keycode / keysym** — keycode 是物理按键编号（1~255 的整数），keysym 是它产生的字符
 或功能（`a`、`Return`、`U4F60`）。两者的对应关系就是那张全局键盘映射表。

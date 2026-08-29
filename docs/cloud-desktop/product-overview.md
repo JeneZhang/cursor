@@ -10,6 +10,7 @@ exec-daemon 打包代码、并用 [`tools/cloud-desktop-audit`](../../tools/clou
 
 配套文档：
 
+- [`recording.md`](./recording.md) — 录制能力专文（采集、事件日志、后处理、重建语义）
 - [`current-state.md`](./current-state.md) — 八组实测数据与缺陷分析
 - [`upgrade-plan.md`](./upgrade-plan.md) — 由数据推出的改造方案
 
@@ -99,6 +100,9 @@ computer-use 暴露 **11 种动作**：
 
 ### 2.4 录制能力
 
+完整说明（采集命令、事件包字段、两层后处理配置、一次真实会话的账、重建 vs 忠实录像）
+见 [`recording.md`](./recording.md)。下面是摘要。
+
 `record_screen` 有三个模式：`START_RECORDING`、`SAVE_RECORDING`、`DISCARD_RECORDING`。
 它产出的不是原始录屏，而是**精修后的演示视频**：
 
@@ -110,10 +114,10 @@ computer-use 暴露 **11 种动作**：
 | 按键提示 | 组合键与输入内容以提示条形式叠在画面上 |
 | 自动缩放 | 按"重要性"给动作打分自动推近镜头，节流到每分钟最多 8 次、最短间隔 1.5 秒 |
 | 空闲加速 | 空闲段分类为加载等待 / 思考停顿 / 查看结果，只加速前两类 |
-| 片头片尾 | 开场推拉镜头，结尾一张带 Cursor 标志的黑底卡片 |
+| 片尾 | 正片之后拼接 2 秒带 Cursor 标志的黑底卡片；没有单独的片头，开头是第一个动作往前 800 ms |
 | 交付 | 重编码后放 `/opt/cursor/artifacts/`，文件名可指定 |
 
-实测一段 34 秒会话的成片是 1920x1200 @ 60 fps、**4.08 MB**。
+实测一次 139 秒采集压成 32 秒正片 + 2 秒片尾，成片 1920x1200 @ 60 fps、**4.08 MB**。
 
 之所以采集阶段用全 I 帧（`keyint=1:min-keyint=1:scenecut=0:bframes=0`），是因为后处理要
 按任意时间点取帧做缩放和变速；帧间预测会让随机取帧变得很贵。这条代理片的
@@ -557,6 +561,8 @@ Chrome 的布局重排完了没有。整条链路里没有任何一处掌握"界
 （[`current-state.md` §4.2](./current-state.md)）。
 
 ### 4.6 为什么录屏要拆成"代理片 + 事件日志 + 后处理"
+
+字段、命令行、两层配置和一次真实会话的账见 [`recording.md`](./recording.md)。这里只写设计理由。
 
 这是整个系统里最漂亮的设计，理由可以从产物反推：
 
