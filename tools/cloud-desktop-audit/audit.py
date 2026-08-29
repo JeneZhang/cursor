@@ -120,7 +120,15 @@ def detect_display():
 def section_inventory():
     display = detect_display()
     _, dpy, _ = run(["xdpyinfo", "-display", DISPLAY])
-    extensions = re.findall(r"^\s{4}(\S+)$", dpy, re.M)
+    # Extension names can contain spaces ("Generic Event Extension"), so the
+    # name pattern has to allow them or the list silently comes up short.
+    extension_block = re.search(r"number of extensions:\s+(\d+)\n((?:\s{4}.+\n)+)", dpy)
+    extensions = (
+        [line.strip() for line in extension_block.group(2).splitlines() if line.strip()]
+        if extension_block
+        else []
+    )
+    reported_extension_count = int(extension_block.group(1)) if extension_block else 0
     dpi = re.search(r"resolution:\s+(\d+)x(\d+) dots per inch", dpy)
 
     _, ps, _ = run(["ps", "-eo", "args="], env=os.environ)
@@ -167,8 +175,10 @@ def section_inventory():
         "api_resolution": {"width": API_WIDTH, "height": api_height},
         "downscale_factor": round(display["width"] / API_WIDTH, 4) if display["width"] else None,
         "x_extensions": extensions,
+        "x_extension_count": reported_extension_count,
         "has_damage_ext": "DAMAGE" in extensions,
         "has_xtest_ext": "XTEST" in extensions,
+        "has_dpms_ext": "DPMS" in extensions,
         "processes": procs,
         "versions": versions,
         "spare_keycodes": len(spare),
@@ -184,6 +194,10 @@ def print_inventory(data):
     print(f"  model sees           {api['width']}x{api['height']} (downscale {data['downscale_factor']}x)")
     print(f"  cpus                 {data['cpu_count']}")
     print(f"  spare keycodes       {data['spare_keycodes']} (caps distinct non-ASCII chars per type run)")
+    print(
+        f"  x extensions         {data['x_extension_count']}"
+        f" (XTEST {data['has_xtest_ext']}, DAMAGE {data['has_damage_ext']}, DPMS {data['has_dpms_ext']})"
+    )
     print("  processes")
     for name, cmd in data["processes"].items():
         print(f"    {name:<16} {cmd or '(not running)'}")

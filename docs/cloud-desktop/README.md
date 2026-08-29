@@ -5,9 +5,13 @@
 
 | 文档 | 内容 |
 | --- | --- |
-| [`current-state.md`](./current-state.md) | 现状：架构怎么搭的、computer-use / 录屏怎么实现的，以及八组实测数据 |
+| [`product-overview.md`](./product-overview.md) | 产品文档：能力清单、架构、每个设计选择的理由，以及预装软件全清单与"为什么装它" |
+| [`current-state.md`](./current-state.md) | 实测数据：八组测量与缺陷分析 |
 | [`upgrade-plan.md`](./upgrade-plan.md) | 升级方案：按优先级排的改造项，每项含根因、改法、预期收益、验证方式、风险 |
 | [`../../tools/cloud-desktop-audit/`](../../tools/cloud-desktop-audit/) | 产生这些数据的脚本，以及一个可复现的端到端桌面示例 |
+
+先看 `product-overview.md` 了解这套东西是什么、怎么搭的、为什么这么搭；
+再看 `current-state.md` 看它跑起来的真实表现；最后看 `upgrade-plan.md` 看要改什么。
 
 ## 复现
 
