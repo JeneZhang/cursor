@@ -10,9 +10,9 @@
   --row-hover: #eef3f9;
   --selected: #dbe7ff;
   --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --board-bg: #dde5ee;
-  --cell-bg: #eaeff5;
-  --overlay-bg: rgba(244, 246, 248, 0.86);
+  --board-bg: #ccd7e5;
+  --cell-bg: #dde5ee;
+  --overlay-bg: rgba(244, 246, 248, 0.88);
   font-family:
     'Segoe UI', 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
   font-size: 14px;
@@ -33,9 +33,9 @@
     --row-hover: #273449;
     --selected: #1e3a5f;
     --shadow: none;
-    --board-bg: #172033;
-    --cell-bg: #1f2b40;
-    --overlay-bg: rgba(17, 24, 39, 0.86);
+    --board-bg: #131c2c;
+    --cell-bg: #222f45;
+    --overlay-bg: rgba(17, 24, 39, 0.88);
   }
 }
 
@@ -351,11 +351,11 @@ kbd {
 }
 
 .tile[data-value='2'] {
-  --tile-bg: #eef3f9;
+  --tile-bg: #ffffff;
   --tile-text: #46536b;
 }
 .tile[data-value='4'] {
-  --tile-bg: #dbe7ff;
+  --tile-bg: #cfe0ff;
   --tile-text: #2b3d5c;
 }
 .tile[data-value='8'] {
