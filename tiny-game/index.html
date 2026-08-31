@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#061018" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Lane Drift</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <header class="top-bar">
+        <p class="brand">Lane Drift</p>
+        <div class="top-actions">
+          <button
+            id="theme-toggle"
+            type="button"
+            class="theme-toggle"
+            aria-label="Switch to light theme"
+            aria-pressed="false"
+          >
+            <span class="theme-toggle-track" aria-hidden="true">
+              <span class="theme-toggle-thumb"></span>
+            </span>
+            <span id="theme-label" class="theme-label">Light</span>
+          </button>
+          <div class="scores">
+            <span id="score">0</span>
+            <span class="best-label">best <strong id="best">0</strong></span>
+          </div>
+        </div>
+      </header>
+
+      <canvas id="game" width="390" height="720" aria-label="Lane Drift game canvas"></canvas>
+
+      <div id="overlay" class="overlay">
+        <div class="panel">
+          <p class="brand brand-lg">Lane Drift</p>
+          <h1 id="overlay-title">Tap to drift</h1>
+          <p id="overlay-copy" class="copy">
+            Swipe or tap left / right. Collect amber gems. Dodge the steel gates.
+          </p>
+          <button id="start-btn" type="button">Play</button>
+          <p class="hint">← → keys work on desktop</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

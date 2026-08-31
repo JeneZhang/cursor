@@ -1,0 +1,19 @@
+{
+  "name": "lane-drift",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tiny mobile-first endless lane game — dodge barriers, collect gems",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vite": "^6.2.1",
+    "vitest": "^3.0.8"
+  }
+}
