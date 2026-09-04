@@ -69,7 +69,12 @@ export default function App(): React.JSX.Element {
               棋盘
               <select
                 value={game.size}
-                onChange={(event) => dispatch({ type: 'resize', size: Number(event.target.value) })}
+                onChange={(event) => {
+                  dispatch({ type: 'resize', size: Number(event.target.value) })
+                  // Hand keyboard focus back to the board, or arrow keys would
+                  // keep cycling the dropdown instead of moving tiles.
+                  event.target.blur()
+                }}
               >
                 {BOARD_SIZES.map((size) => (
                   <option key={size} value={size}>
