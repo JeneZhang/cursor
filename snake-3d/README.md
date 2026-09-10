@@ -13,7 +13,7 @@ cd snake-3d
 python3 -m http.server 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080).
+Open [http://localhost:8080](http://localhost:8080). Optional: [http://localhost:8080/?food=8,7](http://localhost:8080/?food=8,7) places the first pellet directly in front of the snake.
 
 ## Controls
 
