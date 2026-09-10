@@ -1,0 +1,9 @@
+{
+  "name": "snake-3d",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test game.test.mjs",
+    "start": "python3 -m http.server 8080"
+  }
+}
