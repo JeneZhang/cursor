@@ -42,18 +42,18 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.shadowMap.enabled = true
 
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0x070b12)
-scene.fog = new THREE.Fog(0x070b12, 22, 42)
+scene.background = new THREE.Color(0x0b1220)
+scene.fog = new THREE.Fog(0x0b1220, 26, 48)
 
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80)
-camera.position.set(0, 18, 16)
+camera.position.set(0, 17, 15)
 camera.lookAt(0, 0, 0)
 
-scene.add(new THREE.AmbientLight(0x7ea8ff, 0.45))
-const hemi = new THREE.HemisphereLight(0xb7ffd2, 0x142033, 0.7)
+scene.add(new THREE.AmbientLight(0x9ec4ff, 0.55))
+const hemi = new THREE.HemisphereLight(0xc8ffe0, 0x1a2a3d, 0.85)
 scene.add(hemi)
 
-const keyLight = new THREE.DirectionalLight(0xffffff, 1.15)
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.25)
 keyLight.position.set(8, 16, 6)
 keyLight.castShadow = true
 keyLight.shadow.mapSize.set(1024, 1024)
@@ -67,20 +67,21 @@ const floorSize = view.gridSize * CELL
 
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(floorSize, floorSize),
-  new THREE.MeshStandardMaterial({ color: 0x102033, roughness: 0.92, metalness: 0.05 })
+  new THREE.MeshStandardMaterial({ color: 0x17324a, roughness: 0.88, metalness: 0.08 })
 )
 floor.rotation.x = -Math.PI / 2
 floor.receiveShadow = true
 arena.add(floor)
 
-const grid = new THREE.GridHelper(floorSize, view.gridSize, 0x2f6b4a, 0x1b3b32)
+const grid = new THREE.GridHelper(floorSize, view.gridSize, 0x4fd68a, 0x2b6b58)
 grid.position.y = 0.01
 arena.add(grid)
 
 const wallMat = new THREE.MeshStandardMaterial({
-  color: 0x1c3d4d,
-  roughness: 0.65,
-  metalness: 0.15
+  color: 0x3d8a9c,
+  emissive: 0x102830,
+  roughness: 0.55,
+  metalness: 0.2
 })
 const wallH = new THREE.BoxGeometry(floorSize + 0.35, 0.7, 0.28)
 const wallV = new THREE.BoxGeometry(0.28, 0.7, floorSize + 0.35)
@@ -112,17 +113,19 @@ const bodyMat = new THREE.MeshStandardMaterial({
   roughness: 0.45
 })
 const foodMat = new THREE.MeshStandardMaterial({
-  color: 0xff8a4c,
-  emissive: 0x7a2208,
-  roughness: 0.28
+  color: 0xff9a4d,
+  emissive: 0xc44a12,
+  roughness: 0.22
 })
 
 const snakeGroup = new THREE.Group()
 arena.add(snakeGroup)
 
-const foodMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.38, 0), foodMat)
+const foodMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.52, 0), foodMat)
 foodMesh.castShadow = true
 arena.add(foodMesh)
+const foodGlow = new THREE.PointLight(0xff7a3a, 1.4, 6)
+foodMesh.add(foodGlow)
 
 function cellToWorld(cell, y = 0.38) {
   return new THREE.Vector3(cell.x * CELL - half, y, cell.y * CELL - half)
@@ -169,7 +172,6 @@ function renderHud() {
 }
 
 function beginRun() {
-  previousSnake = game.getState().snake.map((cell) => ({ ...cell }))
   view = game.start()
   previousSnake = view.snake.map((cell) => ({ ...cell }))
   tickStartedAt = performance.now()

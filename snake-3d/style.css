@@ -20,10 +20,8 @@ body {
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family:
-    'Segoe UI',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: Ubuntu, 'Noto Sans', 'DejaVu Sans', ui-sans-serif, sans-serif;
+  word-spacing: 0.06em;
 }
 
 #game-canvas {
@@ -75,7 +73,7 @@ body {
   z-index: 3;
   display: grid;
   place-items: center;
-  background: radial-gradient(circle at 50% 40%, rgba(18, 36, 28, 0.28), rgba(4, 7, 12, 0.62));
+  background: radial-gradient(circle at 50% 40%, rgba(18, 36, 28, 0.18), rgba(4, 7, 12, 0.42));
 }
 
 .overlay[hidden] {
@@ -110,7 +108,8 @@ h2 {
 .detail {
   margin: 0 0 18px;
   color: var(--muted);
-  line-height: 1.45;
+  line-height: 1.5;
+  font-size: 16px;
 }
 
 .final-score {
