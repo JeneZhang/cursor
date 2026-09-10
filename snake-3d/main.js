@@ -13,8 +13,27 @@ const eyebrowEl = document.getElementById('eyebrow')
 const finalScoreEl = document.getElementById('final-score')
 const startBtn = document.getElementById('start-btn')
 
-const game = createGame({ gridSize: 15 })
+function foodFromQuery() {
+  const raw = new URLSearchParams(window.location.search).get('food')
+  if (!raw) {
+    return undefined
+  }
+  const [x, y] = raw.split(',').map(Number)
+  if (!Number.isInteger(x) || !Number.isInteger(y)) {
+    return undefined
+  }
+  return { x, y }
+}
+
+const game = createGame({ gridSize: 15, initialFood: foodFromQuery() })
 let view = game.getState()
+window.__snake = {
+  getState: () => view,
+  queueDirection: (dir) => {
+    view = game.queueDirection(dir)
+    return view
+  }
+}
 let previousSnake = view.snake.map((cell) => ({ ...cell }))
 let tickStartedAt = performance.now()
 
