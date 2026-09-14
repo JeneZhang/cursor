@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D 贪吃蛇</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="hud">
+      <div class="hud-left">
+        <h1>3D 贪吃蛇</h1>
+        <p class="subtitle">在立体空间里成长，别撞墙也别咬到自己</p>
+      </div>
+      <div class="hud-right">
+        <div class="stat"><span class="label">得分</span><span id="score">0</span></div>
+        <div class="stat"><span class="label">最高</span><span id="high-score">0</span></div>
+        <div class="stat"><span class="label">长度</span><span id="length">3</span></div>
+      </div>
+    </div>
+
+    <div id="controls-hint">
+      <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 水平移动
+      <span class="sep">·</span>
+      <kbd>Q</kbd><kbd>E</kbd> 上下
+      <span class="sep">·</span>
+      <kbd>Space</kbd> 暂停
+      <span class="sep">·</span>
+      拖拽旋转视角
+    </div>
+
+    <canvas id="game"></canvas>
+
+    <div id="overlay" class="visible">
+      <div class="panel">
+        <p class="eyebrow">立体空间冒险</p>
+        <h2 id="overlay-title">准备出发</h2>
+        <p id="overlay-text">吃掉发光方块，蛇身会变长。撞墙或咬到自己就结束。</p>
+        <button id="start-btn" type="button">开始游戏</button>
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module" src="game.js"></script>
+  </body>
+</html>
