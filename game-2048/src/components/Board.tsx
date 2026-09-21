@@ -38,6 +38,7 @@ export function Board({ size, tiles, swipe }: Props): React.JSX.Element {
       onPointerDown={swipe.onPointerDown}
       onPointerUp={swipe.onPointerUp}
       onPointerCancel={swipe.onPointerCancel}
+      onLostPointerCapture={swipe.onLostPointerCapture}
       role="grid"
       aria-label={`${size} x ${size} 棋盘`}
     >
