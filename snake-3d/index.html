@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Snake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="game-canvas" aria-label="3D Snake arena"></canvas>
+
+    <div class="hud">
+      <p class="label">Score</p>
+      <p id="score" class="score">0</p>
+    </div>
+    <p class="hint">WASD or arrow keys · Space to start / restart</p>
+
+    <div id="overlay" class="overlay">
+      <div class="panel">
+        <p id="eyebrow" class="eyebrow">Grid arena</p>
+        <h1 id="title">3D Snake</h1>
+        <p id="lead" class="lead">Eat food to grow. Hit a wall or yourself and the run ends.</p>
+        <p id="final-score" class="final-score hidden"></p>
+        <button id="start-btn" type="button">Start game</button>
+      </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
