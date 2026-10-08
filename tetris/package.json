@@ -1,0 +1,8 @@
+{
+  "name": "tetris",
+  "private": true,
+  "scripts": {
+    "test": "node --test game.test.mjs",
+    "start": "python3 -m http.server 8765"
+  }
+}
