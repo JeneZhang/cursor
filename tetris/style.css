@@ -1,0 +1,255 @@
+:root {
+  color-scheme: dark;
+  --bg: #0c0e13;
+  --ink: #f4f1ea;
+  --muted: #a7aebc;
+  --amber: #f0c36a;
+  --mint: #79d7c8;
+  --panel: #171b24;
+  --well: #090b10;
+  --line: rgba(255, 255, 255, 0.08);
+  --card: #222836;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1000px 420px at 50% -10%, rgba(121, 215, 200, 0.16), transparent 60%),
+    radial-gradient(700px 380px at 100% 100%, rgba(240, 195, 106, 0.1), transparent 55%),
+    var(--bg);
+  color: var(--ink);
+  font-family: 'WenQuanYi Micro Hei', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+}
+
+button,
+p,
+h1,
+h2,
+span,
+strong {
+  user-select: none;
+}
+
+.app {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 16px 16px 24px;
+}
+
+.top {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--mint);
+  letter-spacing: 0.28em;
+  font-size: 12px;
+}
+
+h1 {
+  margin: 6px 0 0;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.layout {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.stage {
+  position: relative;
+  width: min(300px, 100%, calc((100dvh - 210px) / 2));
+  border-radius: 16px;
+  padding: 10px;
+  background: linear-gradient(180deg, #2a3142, #141820);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+#board {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: var(--well);
+}
+
+.flash {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(12, 14, 19, 0.82);
+  color: var(--amber);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(8, 10, 14, 0.72);
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.card {
+  width: min(240px, 86%);
+  padding: 22px 18px 18px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.card p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.overlay-score {
+  color: var(--amber);
+  font-size: 20px;
+}
+
+#action-btn,
+.touch button {
+  font: inherit;
+  color: #1a1408;
+  background: var(--amber);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#action-btn {
+  margin-top: 16px;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 16px;
+}
+
+#action-btn:focus-visible,
+.touch button:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+
+.panel {
+  width: 168px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.next-box canvas {
+  display: block;
+  width: 112px;
+  height: 112px;
+  margin-top: 6px;
+  border-radius: 8px;
+  background: var(--well);
+}
+
+.hint {
+  margin: 16px 0 0;
+  text-align: center;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.touch {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  width: min(640px, 100%);
+  margin: 16px auto 0;
+}
+
+.touch button {
+  min-height: 48px;
+  font-size: 15px;
+  touch-action: manipulation;
+}
+
+.touch button:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 720px) {
+  h1 {
+    font-size: 32px;
+  }
+
+  .layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .panel {
+    width: min(300px, 100%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .next-box {
+    grid-column: 1 / -1;
+  }
+
+  .touch {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
