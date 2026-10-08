@@ -1,0 +1,179 @@
+:root {
+  color-scheme: light;
+  --bg: #f4efe6;
+  --ink: #241910;
+  --muted: #6d5c4e;
+  --card: #fffaf3;
+  --line: #e4d5c4;
+  --accent: #c4552a;
+  --accent-dark: #8d3516;
+  --tag: #f3e1c8;
+  --pending: #efe6d4;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 0%, #ffe7c4 0, transparent 34%),
+    radial-gradient(circle at 100% 12%, #f7d7c4 0, transparent 28%),
+    var(--bg);
+}
+
+.hero,
+main,
+footer {
+  width: min(880px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.hero {
+  padding: 48px 0 8px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-dark);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 40px;
+  line-height: 1.2;
+}
+
+.lead,
+.card p,
+.pending p,
+footer p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.lead {
+  max-width: 38em;
+  margin: 0;
+  font-size: 18px;
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card,
+.pending {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 22px 20px;
+}
+
+.tag {
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--tag);
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+h2 {
+  margin: 4px 0 0;
+  font-size: 24px;
+}
+
+.card p,
+.pending p {
+  margin: 0;
+}
+
+.path,
+.note {
+  font-size: 14px;
+}
+
+code {
+  font-family: ui-monospace, "SFMono-Regular", "Source Code Pro", Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  color: var(--ink);
+}
+
+.play {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.play:hover,
+.play:focus-visible {
+  background: var(--accent-dark);
+}
+
+.play:focus-visible {
+  outline: 2px solid var(--accent-dark);
+  outline-offset: 3px;
+}
+
+.pending {
+  margin-top: 16px;
+  padding: 20px 22px;
+  background: var(--pending);
+}
+
+.pending h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.pending p + p {
+  margin-top: 8px;
+}
+
+footer {
+  padding: 20px 0 40px;
+}
+
+footer p {
+  margin: 0;
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    padding-top: 32px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .games {
+    grid-template-columns: 1fr;
+  }
+}
