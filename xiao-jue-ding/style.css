@@ -204,6 +204,11 @@ button {
   text-align: center;
 }
 
+.footer a {
+  color: var(--accent-dark);
+  margin-left: 8px;
+}
+
 @media (max-width: 480px) {
   .card {
     padding: 26px 18px 22px;
